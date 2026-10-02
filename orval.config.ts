@@ -6,14 +6,13 @@ export default defineConfig({
       target: './openapi/openapi.yaml',
     },
     output: {
-      mode: 'tags-split',
-      target: './src/generated/endpoints.ts',
+      mode: 'split',
+      target: './src/generated/api.ts',
       schemas: './src/generated/model',
       client: 'react-query',
       httpClient: 'fetch',
       clean: true,
       indexFiles: true,
-      tagsSplitDeduplication: true,
       baseUrl: {
         getBaseUrlFromSpecification: true,
       },
