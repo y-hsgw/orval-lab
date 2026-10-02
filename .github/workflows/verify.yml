@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -16,5 +17,7 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm run generate
+      - name: Verify generated client is committed
+        run: git diff --exit-code -- src/generated
       - run: npm run typecheck
       - run: npm run build
