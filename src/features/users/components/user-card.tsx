@@ -1,9 +1,9 @@
 'use client';
 
-import { useUser } from '../hooks/use-user';
+import { useGetUser } from '@/generated/api';
 
 export function UserCard({ id }: { id: number }) {
-  const { user, isLoading, isError, error } = useUser(id);
+  const { data: user, isLoading, isError, error } = useGetUser(id);
 
   if (isLoading) {
     return <p>Loading...</p>;
