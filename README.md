@@ -2,7 +2,7 @@
 
 Next.js App Router + Orval + TanStack Query の検証用リポジトリです。
 
-## 検証したい構成
+## 検証する構成
 
 ### Server Component
 
@@ -14,7 +14,7 @@ Server Component
 ```
 
 ```tsx
-import { getUser } from '@/generated/users/users';
+import { getUser } from '@/generated/api';
 
 export default async function Page() {
   const user = await getUser(1);
@@ -27,43 +27,55 @@ export default async function Page() {
 
 ```text
 Client Component
-  -> 自作 custom hook
   -> Orval が生成した TanStack Query hook
   -> fetch
   -> API
 ```
 
-```ts
+```tsx
 'use client';
 
-import { useGetUser } from '@/generated/users/users';
+import { useGetUser } from '@/generated/api';
 
-export function useUser(id: number) {
-  const query = useGetUser(id);
+export function UserCard({ id }: { id: number }) {
+  const { data: user, isLoading } = useGetUser(id);
 
-  return {
-    user: query.data,
-    isLoading: query.isLoading,
-    isError: query.isError,
-  };
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  return <p>{user?.name}</p>;
 }
 ```
+
+単純に API を1つ呼ぶだけなら custom hook は作らず、Orval が生成した `useGetUser` をそのまま使います。
+複数 API の組み合わせやアプリ固有ロジックが必要になった場合だけ custom hook を追加します。
 
 ## Orval 設定
 
 ```ts
 output: {
-  mode: 'tags-split',
+  mode: 'split',
+  target: './src/generated/api.ts',
+  schemas: './src/generated/model',
   client: 'react-query',
   httpClient: 'fetch',
 }
 ```
 
-- `client: 'react-query'`: TanStack Query 用の hook / query options 等を生成する
+- `client: 'react-query'`: TanStack Query 用の query / mutation hooks を生成する
 - `httpClient: 'fetch'`: API 通信に Fetch API を使う
-- `mode: 'tags-split'`: OpenAPI の tag 単位で生成コードを分割する
+- `mode: 'split'`: endpoint と model を分けて生成する
 
-このリポジトリでは OpenAPI の `users` tag から `src/generated/users/` 以下が生成される想定です。
+生成結果:
+
+```text
+src/generated/
+├─ api.ts
+└─ model/
+   ├─ index.ts
+   └─ user.ts
+```
 
 ## 実行
 
@@ -74,20 +86,21 @@ npm run typecheck
 npm run dev
 ```
 
-生成物は Orval による自動生成コードなので、アプリ固有ロジックは `src/features` 側に置きます。
+`src/generated` は Git にコミットします。
+CI では `npm run generate` 後に生成差分がないことを確認します。
 
 ## 責務
 
 ```text
 src/generated
-  OpenAPI / Orval の世界
+  OpenAPI から Orval が生成した API client / hooks / model
 
-src/features/*/hooks
-  Client 側のアプリ固有 hook
+src/features
+  アプリ固有の UI / ロジック
 
 src/app
   Next.js の Server / Client Components
 ```
 
-Server Component では不要な TanStack Query を経由せず、生成された通常関数を直接利用します。
-Client Component では Orval の hook を直接 UI に露出させず、自作 custom hook でラップします。
+Server Component では TanStack Query を経由せず、生成された通常関数を直接利用します。
+Client Component では生成された `useGetUser` などの TanStack Query hook を直接利用できます。
