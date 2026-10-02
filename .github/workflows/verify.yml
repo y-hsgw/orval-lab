@@ -18,6 +18,9 @@ jobs:
       - run: npm install
       - run: npm run generate
       - name: Verify generated client is committed
-        run: test -z "$(git status --porcelain -- src/generated)"
+        run: |
+          git status --short -- src/generated
+          git diff -- src/generated
+          test -z "$(git status --porcelain -- src/generated)"
       - run: npm run typecheck
       - run: npm run build
