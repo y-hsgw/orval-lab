@@ -46,6 +46,7 @@ export const getGetUserUrl = (id: number,) => {
 
 
 
+
   return `https://jsonplaceholder.typicode.com/users/${id}`
 }
 
