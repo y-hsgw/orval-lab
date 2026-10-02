@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetUser } from '@/generated/users/users';
+import { useGetUser } from '@/generated/api';
 
 export function useUser(id: number) {
   const query = useGetUser(id);
