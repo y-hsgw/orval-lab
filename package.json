@@ -11,7 +11,7 @@
     "build": "npm run generate && next build",
     "start": "next start",
     "generate": "orval --config ./orval.config.ts",
-    "typecheck": "npm run generate && tsc --noEmit"
+    "typecheck": "npm run generate && next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@tanstack/react-query": "5.104.0",
