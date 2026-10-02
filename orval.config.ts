@@ -17,6 +17,11 @@ export default defineConfig({
       baseUrl: {
         getBaseUrlFromSpecification: true,
       },
+      override: {
+        fetch: {
+          includeHttpResponseReturnType: false,
+        },
+      },
     },
   },
 });
