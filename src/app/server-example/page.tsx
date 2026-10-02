@@ -1,4 +1,4 @@
-import { getUser } from '@/generated/users/users';
+import { getUser } from '@/generated/api';
 
 export default async function ServerExamplePage() {
   const user = await getUser(1);
